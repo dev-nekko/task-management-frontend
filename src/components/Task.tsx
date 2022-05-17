@@ -1,6 +1,6 @@
 import React from 'react'
-import { TaskDTO } from '../api/dto/task.dto';
-import {Card,CardActions,CardContent,CardMedia, Button, Container, Typography } from '@mui/material';
+import { TaskDTO, TaskStatus } from '../api/dto/task.dto';
+import {Card,CardActions,CardContent,CardMedia, Button, Container, Typography, Chip  } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import { TaskAPI } from '../api/task.api';
@@ -9,13 +9,54 @@ import { TaskAPI } from '../api/task.api';
 interface Props{
     data:TaskDTO;
     onTaskDelete: (taskId: number) => void;
+    onTaskUpdated: (task: TaskDTO) =>void;
 }
 
-const Task = ({data, onTaskDelete}: Props) =>{
+const Task = ({data, onTaskDelete, onTaskUpdated}: Props) =>{
     const deleteTask = async () =>{
       await TaskAPI.deleteOne(data.id);
       onTaskDelete(data.id);
     }
+
+    const getTaskStatusToString = (status: TaskStatus) =>{
+      let text: string = '';
+      switch(status)
+      {
+        case TaskStatus.Created:
+          text = "Created";
+          break;
+        case TaskStatus.InProgress:
+          text = "InProgress";
+          break;
+        case TaskStatus.Done:
+          text = "Done";
+          break;
+        default:
+          text = "";
+      }
+      return text;
+    };
+
+    const getTaskStatusColor = (status: TaskStatus) => {
+      let color: string = '';
+      switch(status)
+      {
+        case TaskStatus.Created:
+          color = "gray";
+          break;
+        case TaskStatus.InProgress:
+          color = "orange";
+          break;
+        case TaskStatus.Done:
+          color = "green";
+          break;
+        default:
+          color = "";
+      }
+      return color;
+
+    };
+
     return (
         <Card sx={{ maxWidth: 345 }}>
           <CardMedia
@@ -31,13 +72,16 @@ const Task = ({data, onTaskDelete}: Props) =>{
             <Typography variant="body2" color="text.secondary">
              {data.description}
             </Typography>
+            <Chip label={getTaskStatusToString(data.status)} style = {{margin: 7,backgroundColor:getTaskStatusColor(data.status)}} />
           </CardContent>
           <CardActions>
               <Container>
-                <Button size="small" variant="contained"  endIcon={<SendIcon />} style={{marginLeft: 5}}>
+                <Button size="small" variant="contained"  endIcon={<SendIcon />} 
+                        style={{marginLeft: 5}} onClick={()=>onTaskUpdated(data)}>
                     Edit
                 </Button>
-                <Button size="small" variant="outlined" startIcon={<DeleteIcon />} style={{marginLeft: 5}} onClick={deleteTask}>
+                <Button size="small" variant="outlined" startIcon={<DeleteIcon />} 
+                        style={{marginLeft: 5}} onClick={deleteTask}>
                     Delete
                 </Button>
               </Container>

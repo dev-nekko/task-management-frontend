@@ -82,4 +82,4 @@ const CreateTaskModal = (props: Props) => {
   )
 }
 
-export default CreateTaskModal
+export default CreateTaskModal;

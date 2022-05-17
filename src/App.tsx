@@ -8,11 +8,14 @@ import Task from './components/Task';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import CreateTaskModal from './components/CreateTaskModal';
+import EditTaskModal from './components/EditTaskModal';
 
 function App() {
 
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
   const [createTaskModalOpen, setCreateTaskModalOpen] = useState(false);
+  const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
+  const [taskBeingEdited, setTaskBeingEdited] = useState<undefined | TaskDTO>(undefined);
 
   const addTask = (task:TaskDTO) => {
     setTasks([...tasks,task])
@@ -21,6 +24,15 @@ function App() {
 
   const deleteTask = (taskId: number) => {
     setTasks(tasks.filter((x)=>x.id !== taskId));
+
+  };
+
+  const editTask = (task:TaskDTO) => {
+    setTasks(tasks.map((x)=>{
+      if(x.id === task.id) return task;
+      return x;
+      })
+    );
 
   };
 
@@ -35,12 +47,22 @@ function App() {
   }, [])
 
 
+  const onTaskEditBtnClicked = (task: TaskDTO)=>{
+
+  }
+
   return (
     <div className="App">
       <CreateTaskModal 
         open={createTaskModalOpen} 
         handleClose={()=>setCreateTaskModalOpen(false)}
         onTaskCreated = {addTask}
+      />
+      <EditTaskModal 
+        data = {taskBeingEdited}
+        open={editTaskModalOpen} 
+        handleClose={()=>setEditTaskModalOpen(false)}
+        onTaskUpdated = {editTask}
       />
       <AppBar position="static">
         <Toolbar>
@@ -65,7 +87,13 @@ function App() {
         {tasks.map(task => {
           return(
             <Grid item xs={3}>
-              <Task data={task} onTaskDelete={deleteTask}/>
+              <Task 
+              data={task} 
+              onTaskDelete={deleteTask} 
+              onTaskUpdated={(task: TaskDTO) =>{
+                setTaskBeingEdited(task);
+                setEditTaskModalOpen(true);
+              }}/>
             </Grid>
           );
         })}
