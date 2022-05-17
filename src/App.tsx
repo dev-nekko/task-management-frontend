@@ -7,10 +7,22 @@ import { Grid, AppBar, Toolbar,Typography,Button,IconButton  } from '@mui/materi
 import Task from './components/Task';
 import MenuIcon from '@mui/icons-material/Menu';
 
+import CreateTaskModal from './components/CreateTaskModal';
+
 function App() {
 
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createTaskModalOpen, setCreateTaskModalOpen] = useState(false);
+
+  const addTask = (task:TaskDTO) => {
+    setTasks([...tasks,task])
+
+  };
+
+  const deleteTask = (taskId: number) => {
+    setTasks(tasks.filter((x)=>x.id !== taskId));
+
+  };
 
   useEffect(() => {
     async function fetchAll(){
@@ -25,6 +37,11 @@ function App() {
 
   return (
     <div className="App">
+      <CreateTaskModal 
+        open={createTaskModalOpen} 
+        handleClose={()=>setCreateTaskModalOpen(false)}
+        onTaskCreated = {addTask}
+      />
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -39,14 +56,16 @@ function App() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Task Management
           </Typography>
-          <Button variant= "contained" color="success">Create Task</Button>
+          <Button variant= "contained" color="success" onClick={()=>setCreateTaskModalOpen(true)}>
+            Create Task
+          </Button>
         </Toolbar>
       </AppBar>
       <Grid container spacing={1} style={{padding: 10}}>
         {tasks.map(task => {
           return(
             <Grid item xs={3}>
-              <Task data={task}/>
+              <Task data={task} onTaskDelete={deleteTask}/>
             </Grid>
           );
         })}
