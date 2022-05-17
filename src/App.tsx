@@ -1,24 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { TaskAPI } from './api/task.api';
+import { TaskDTO } from './api/dto/task.dto';
+
 
 function App() {
+
+  const [tasks, setTasks] = useState<TaskDTO[]>([])
+
+  useEffect(() => {
+    async function fetchAll(){
+      const resp = await TaskAPI.getAll();
+
+      setTasks(resp);
+    }
+
+    fetchAll();
+  }, [])
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ul>
+          {
+        tasks.map(task => {
+          return <li>{task.title}</li>
+        })
+      }
+      </ul>
+    
     </div>
   );
 }
